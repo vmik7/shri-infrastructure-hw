@@ -1,5 +1,5 @@
 {
-  "name": "hep-template",
+  "name": "shri-infrastructure-hw",
   "version": "1.0.0",
   "description": "Template repository with Husky & ESLint & Prettier",
   "main": "index.js",
@@ -8,7 +8,7 @@
     "lint": "eslint src --fix",
     "prepare": "husky install"
   },
-  "repository": "https://github.com/vmik7/hep-template.git",
+  "repository": "https://github.com/vmik7/shri-infrastructure-hw.git",
   "author": "vmik7 <vmik7@yandex.ru>",
   "license": "MIT",
   "devDependencies": {

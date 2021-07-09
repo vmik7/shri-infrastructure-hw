@@ -1,2 +1,3 @@
-# hep-template
-Template repository with Husky &amp; ESLint &amp; Prettier
+# shri-infrastructure-hw
+
+Домашняя работа по инфраструктуре.
