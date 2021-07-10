@@ -6,6 +6,8 @@ const morgan = require('morgan');
 const { PORT } = require('./config');
 const { mainRouter } = require('./router');
 
+const { waitForRegister } = require('./utils/waitForRegister');
+
 /** Stream for logs */
 
 const accessLogStream = fs.createWriteStream(path.resolve('access.log'), {
@@ -29,3 +31,9 @@ app.use('/', mainRouter);
 app.listen(PORT, () => {
     console.log(`Agent started! http://localhost:${PORT}`);
 });
+
+/** Registration */
+
+(async () => {
+    await waitForRegister();
+})();

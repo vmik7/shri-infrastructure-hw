@@ -5,6 +5,10 @@ const morgan = require('morgan');
 
 const { PORT } = require('./config');
 const { mainRouter } = require('./router');
+const { fetchSettings } = require('./api/fetchSettings');
+const { cancelPastBuilds } = require('./utils/cancelPastBuilds');
+const { settings } = require('./data');
+const { lifeCycle } = require('./utils/lifeCycle');
 
 /** Stream for logs */
 
@@ -26,6 +30,22 @@ app.use(
 app.use(express.json());
 app.use('/', mainRouter);
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     console.log(`Server started! http://localhost:${PORT}`);
+
+    const { data } = await fetchSettings();
+
+    if (!data) {
+        process.exit(-1);
+    }
+
+    settings.id = data.id;
+    settings.period = data.period;
+    settings.repoUrl = `https://github.com/${data.repoName}.git`;
+    settings.buildCommand = data.buildCommand;
+    settings.mainBranch = data.mainBranch;
+
+    await cancelPastBuilds();
+
+    lifeCycle();
 });

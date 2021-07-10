@@ -4,9 +4,7 @@
   "description": "agent",
   "author": "vmik7 <vmik7@yandex.ru>",
   "license": "ISC",
-
   "main": "index.js",
-
   "engineStrict": true,
   "engines": {
     "node": "^14.17.0"
@@ -15,14 +13,13 @@
     "start": "node index",
     "watch": "nodemon index"
   },
-
   "dependencies": {
     "axios": "^0.21.1",
+    "delay": "^5.0.0",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "morgan": "^1.10.0"
   },
-
   "devDependencies": {
     "nodemon": "^2.0.10"
   }
