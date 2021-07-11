@@ -10,17 +10,20 @@ async function fetchBuilds({ offset, limit } = {}) {
     }
 
     try {
-        const response = await axiosInstance.get('/build/list', { params });
+        const response = await axiosInstance.get('/build/list', { ...params });
 
-        if (response.status === 200) {
-            return response.data;
+        if (response.status !== 200) {
+            console.error(
+                'Fetch builds response has a status',
+                response.status,
+            );
+            return null;
         }
 
-        console.error('Fetch builds response has a status', response.status);
-        return false;
+        return response.data;
     } catch (err) {
         console.error('Fetch builds error!', err);
-        return false;
+        return null;
     }
 }
 

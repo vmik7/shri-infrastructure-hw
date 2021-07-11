@@ -1,28 +1,32 @@
-const { fetchSettings } = require('../api/fetchSettings');
-const { settings } = require('../data');
-const { cancelPastBuilds } = require('./cancelPastBuilds');
-const { checkProcessed } = require('./checkProcessed');
+const signale = require('signale');
+
+const serverData = require('../data');
+const { checkSettings } = require('./checkSettings');
+const { fetchWaiting } = require('./fetchWaiting');
+const { findPastBuilds } = require('./findPastBuilds');
+const { getLastCommit } = require('./getLastCommit');
+const { checkAgents } = require('./checkAgents');
 const { distributeBuilds } = require('./distributeBuilds');
 
 async function lifeCycle() {
-    console.log('[lifeCycle starts]');
+    // signale.start('lifeCycle');
 
-    const { data } = await fetchSettings();
+    const { actions, eventEmmiter } = serverData;
 
-    if (data && data.id !== settings.id) {
-        settings.id = data.id;
-        settings.period = data.period;
-        settings.repoUrl = `https://github.com/${data.repoName}.git`;
-        settings.buildCommand = data.buildCommand;
-        settings.mainBranch = data.mainBranch;
+    const settingsChanged = await checkSettings();
 
-        await cancelPastBuilds();
+    if (settingsChanged) {
+        serverData.mainQueue = [];
+        await getLastCommit();
+        await findPastBuilds();
+        eventEmmiter.emit(actions.settingsChanged);
     }
 
-    await checkProcessed();
+    await fetchWaiting();
+    await checkAgents();
     await distributeBuilds();
 
-    setTimeout(lifeCycle, 10000);
+    setTimeout(lifeCycle, 0);
 }
 
 module.exports = { lifeCycle };

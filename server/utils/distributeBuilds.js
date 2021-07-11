@@ -1,74 +1,119 @@
-const { settings, agents, agentByBuildId } = require('../data');
-const { startBuild } = require('../api/startBuild');
-const { fetchBuilds } = require('../api/fetchBuilds');
+const signale = require('signale');
+
+const serverData = require('../data');
 
 async function distributeBuilds() {
-    console.log('[distributeBuilds]');
+    // signale.start('distributeBuilds');
 
-    // счётчик агентов
-    let agentIndex = 0;
+    const {
+        settings: { repoUrl, buildCommand },
+        agents,
+        mainQueue,
+        rebuildQueue,
+        eventEmmiter,
+        actions,
+    } = serverData;
 
-    // достаём сборки из базы данных
-    const { data: allBuilds } = await fetchBuilds();
+    /** Ищем свободных агентов */
 
-    if (!allBuilds) {
-        // не удалось получить список сборок
-        console.error('Не удалось получить список сборок!');
-        return;
-    }
+    const freeAgents = [];
 
-    // выбирам сборки, которые в статусе Waiting и меняем порядок
-    const waitingBuilds = allBuilds
-        .filter((build) => build.status === 'Waiting')
-        .reverse();
-
-    console.log('Found', waitingBuilds.length, 'waiting builds.');
-
-    let indexToStart = 0;
-    while (indexToStart < waitingBuilds.length) {
-        const { id, commitHash } = waitingBuilds[indexToStart];
-
-        while (agentIndex < agents.length && !agents[agentIndex].isFree) {
-            agentIndex++;
+    agents.forEach((agent, agentUrl) => {
+        if (agent.isFree()) {
+            freeAgents.push(agentUrl);
         }
-        if (agentIndex >= agents.length) {
-            // все агенты заняты, выходим
-            console.log('Have no free agents (');
+    });
+
+    /** Отчёт */
+
+    // signale.note(`Найдено ${freeAgents.length} свободных агентов`);
+
+    /** Распределяем задачи с очереди перезапуска */
+
+    let agentIndex = 0;
+    let currentBuildIndex = 0;
+
+    while (currentBuildIndex < rebuildQueue.length) {
+        const { id, commitHash } = rebuildQueue[currentBuildIndex];
+
+        if (agentIndex >= freeAgents.length) {
             break;
         }
 
-        const agent = agents[agentIndex];
+        const agent = agents.get(freeAgents[agentIndex]);
 
-        const isStarted = agent.build({
-            id,
-            repoUrl: settings.repoUrl,
-            commitHash,
-            buildCommand: settings.buildCommand,
-        });
-        if (isStarted) {
-            // запуск успешен
-
-            agentByBuildId.set(id, agent);
-            agent.isFree = false;
-
-            console.log('Current agents:', agents);
-
-            // await startBuild({
-            //     buildId: id,
-            //     dateTime: new Date().toISOString(),
-            // });
-
-            indexToStart++;
-            agentIndex++;
-        } else if (!(await agent.isAlive())) {
-            console.error('Не удалось запустить сборку, агент не отвечает!');
-
-            agents.splice(agentIndex, 1);
+        if (
+            await agent.build({
+                id,
+                repoUrl,
+                commitHash,
+                buildCommand,
+            })
+        ) {
+            /** Агент запустился, запускаем event */
+            eventEmmiter.emit(actions.buildStarted, {
+                id,
+                dateTime: new Date().toISOString(),
+            });
+            currentBuildIndex++;
         } else {
-            console.error('Не удалось запустить сборку, но агент жив!');
-
-            agentIndex++;
+            /** Агент не смог запустить сборку, забываем о нём навсегда */
+            agents.delete(freeAgents[agentIndex]);
         }
+        agentIndex++;
+    }
+
+    /** Удаляем перезапущенные задачи из очереди */
+
+    rebuildQueue.splice(0, currentBuildIndex);
+
+    /** Отчёт */
+
+    if (currentBuildIndex) {
+        signale.note(`Перезапущено ${currentBuildIndex} сборок`);
+    }
+
+    /** Распределяем задачи с очереди перезапуска */
+
+    currentBuildIndex = 0;
+
+    while (currentBuildIndex < mainQueue.length) {
+        const { id, commitHash } = mainQueue[currentBuildIndex];
+
+        if (agentIndex >= freeAgents.length) {
+            break;
+        }
+
+        const agent = agents.get(freeAgents[agentIndex]);
+
+        if (
+            await agent.build({
+                id,
+                repoUrl,
+                commitHash,
+                buildCommand,
+            })
+        ) {
+            /** Агент запустился, запускаем event */
+            eventEmmiter.emit(actions.buildStarted, {
+                id,
+                dateTime: new Date().toISOString(),
+            });
+            currentBuildIndex++;
+        } else {
+            /** Агент не смог запустить сборку, забываем о нём навсегда */
+            agents.delete(freeAgents[agentIndex]);
+        }
+        agentIndex++;
+    }
+
+    /** Удаляем запущенные задачи из очереди */
+    mainQueue.splice(0, currentBuildIndex);
+
+    /** Отчёт */
+
+    if (currentBuildIndex) {
+        signale.note(`Запущено ${currentBuildIndex} сборок`);
     }
 }
 

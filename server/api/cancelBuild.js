@@ -1,6 +1,6 @@
 const { axiosInstance } = require('../config');
 
-async function cancelBuild(buildId) {
+async function cancelBuild({ buildId }) {
     try {
         const response = await axiosInstance.post('/build/cancel', { buildId });
         if (response.status !== 200) {
@@ -8,11 +8,12 @@ async function cancelBuild(buildId) {
                 'CancelBuild finished with the status',
                 response.status,
             );
+            return null;
         }
-        return response.status === 200;
+        return response.status;
     } catch (err) {
         console.error('CancelBuild error!', err);
-        return false;
+        return null;
     }
 }
 

@@ -1,5 +1,6 @@
 {
   "port": 5051,
   "apiBaseUrl": "https://shri.yandex/hw/api",
-  "apiToken": "asdfgh"
+  "apiToken": "Bearer your_api_token_here",
+  "githubToken": "token your_github_token_here"
 }

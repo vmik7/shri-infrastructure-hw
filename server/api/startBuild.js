@@ -12,12 +12,13 @@ async function startBuild({ buildId, dateTime }) {
                 'StartBuild finished with the status',
                 response.status,
             );
+            return null;
         }
 
-        return response.status === 200;
+        return response.status;
     } catch (err) {
         console.error('StartBuild error!', err);
-        return false;
+        return null;
     }
 }
 

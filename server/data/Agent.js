@@ -3,15 +3,24 @@ const axios = require('axios');
 function Agent(host, port) {
     this.host = host;
     this.port = port;
-    this.isFree = true;
+    this.buildId = null;
+    this.commitHash = null;
 }
+
+Agent.prototype.getUrl = function () {
+    return `http://${this.host}:${this.port}`;
+};
+
+Agent.prototype.isFree = function () {
+    return this.buildId === null;
+};
 
 Agent.prototype.isAlive = async function () {
     try {
-        const response = await axios.get(`http://${this.host}:${this.port}`);
+        const response = await axios.get(this.getUrl());
         return response.status === 200;
-    } catch {
-        console.error('Can not connect with agent!');
+    } catch (err) {
+        console.error('Can not connect with agent', this.getUrl(), '!', err);
         return false;
     }
 };
@@ -23,13 +32,20 @@ Agent.prototype.build = async function ({
     buildCommand,
 }) {
     try {
-        const response = await axios.post(
-            `http://${this.host}:${this.port}/build`,
-            { id, repoUrl, commitHash, buildCommand },
-        );
-        return response.status === 200;
+        const response = await axios.post(this.getUrl(), {
+            id,
+            repoUrl,
+            commitHash,
+            buildCommand,
+        });
+        if (response.status === 200) {
+            this.buildId = id;
+            this.commitHash = commitHash;
+            return true;
+        }
+        return false;
     } catch (err) {
-        console.error('Can not connect with agent!', err);
+        console.error('Can not connect with agent', this.getUrl(), '!', err);
         return false;
     }
 };

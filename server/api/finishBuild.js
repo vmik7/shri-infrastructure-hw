@@ -14,12 +14,13 @@ async function finishBuild({ buildId, duration, success, buildLog }) {
                 'FinishBuild finished with the status',
                 response.status,
             );
+            return null;
         }
 
-        return response.status === 200;
+        return response.status;
     } catch (err) {
         console.error('FinishBuild error!', err);
-        return false;
+        return null;
     }
 }
 
