@@ -14,9 +14,6 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN || config.githubToken;
 /** Constants */
 
 exports.PORT = PORT;
-// exports.API_TOKEN = API_TOKEN;
-// exports.API_BASE_URL = API_BASE_URL;
-// exports.GITHUB_TOKEN = GITHUB_TOKEN;
 
 /** Axios configuration */
 

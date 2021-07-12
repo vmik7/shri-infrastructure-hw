@@ -10,7 +10,7 @@ async function fetchBuilds({ offset, limit } = {}) {
     }
 
     try {
-        const response = await axiosInstance.get('/build/list', { ...params });
+        const response = await axiosInstance.get('/build/list', { params });
 
         if (response.status !== 200) {
             console.error(

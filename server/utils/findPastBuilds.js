@@ -8,37 +8,51 @@ async function findPastBuilds() {
 
     const { settings, eventEmmiter, actions } = serverData;
 
-    /** Достаём все сборки из базы данных */
+    const pastBuilds = [];
 
-    // TODO: Собирать сборки по частям
+    const limit = 25;
+    let offset = 0;
+    let allLoaded = false;
 
-    const { data: allBuilds } = await fetchBuilds();
+    while (!allLoaded) {
+        /** Достаём сборки из базы данных */
+        const { data: allBuilds } = await fetchBuilds({ limit, offset });
 
-    if (!allBuilds) {
-        // не удалось получить список сборок
-        signale.error('Не удалось получить список сборок!');
-        return;
+        if (!allBuilds) {
+            signale.error('Не удалось получить список сборок!');
+            return;
+        }
+
+        /** Выбирам сборки, которые в статусе InProgress или Waiting
+         * и которые не совпадают с текущими настройками
+         * */
+        const buildsToCancel = allBuilds.filter((build) => {
+            return (
+                (build.status === 'InProgress' || build.status === 'Waiting') &&
+                build.configurationId !== settings.id
+            );
+        });
+
+        /** Если массив пустой, значи уже всё загружено */
+        if (buildsToCancel.length === 0) {
+            allLoaded = true;
+        }
+
+        pastBuilds.push(...buildsToCancel);
+
+        if (!allLoaded) {
+            offset += limit;
+        }
     }
 
-    /** Выбирам сборки, которые в статусе InProgress или Waiting
-     * и которые не совпадают с текущими настройками
-     * */
-
-    const buildsToCancel = allBuilds.filter((build) => {
-        return (
-            (build.status === 'InProgress' || build.status === 'Waiting') &&
-            build.configurationId !== settings.id
-        );
-    });
-
-    for (const build of buildsToCancel) {
+    for (const build of pastBuilds) {
         eventEmmiter.emit(actions.buildCanceled({ buildId: build.id }));
     }
 
     /** Отчёт */
 
-    if (buildsToCancel.length) {
-        signale.note('Found', buildsToCancel.length, 'past builds');
+    if (pastBuilds.length) {
+        signale.note('Found', pastBuilds.length, 'past builds');
     }
 }
 

@@ -1,4 +1,3 @@
-const signale = require('signale');
 const EventEmitter = require('events');
 
 // текущие настройки CI сервера
