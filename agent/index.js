@@ -2,11 +2,12 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
+const signale = require('signale');
 
 const { PORT } = require('./config');
 const { mainRouter } = require('./router');
 
-const { waitForRegister } = require('./utils/waitForRegister');
+const { tryToRegister } = require('./utils/tryToRegister');
 
 /** Stream for logs */
 
@@ -29,11 +30,8 @@ app.use(express.json());
 app.use('/', mainRouter);
 
 app.listen(PORT, () => {
-    console.log(`Agent started! http://localhost:${PORT}`);
+    signale.start(`Agent started! http://localhost:${PORT}`);
+
+    signale.await('Waiting for registration...');
+    tryToRegister();
 });
-
-/** Registration */
-
-(async () => {
-    await waitForRegister();
-})();

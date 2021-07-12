@@ -50,9 +50,13 @@ async function distributeBuilds() {
                 buildCommand,
             })
         ) {
-            /** Агент запустился, запускаем event */
-            eventEmmiter.emit(actions.buildStarted, {
+            /** Агент запустился, запускаем events */
+            eventEmmiter.emit(actions.agentStarted, {
                 id,
+                agentUrl: agent.getUrl(),
+            });
+            eventEmmiter.emit(actions.buildStarted, {
+                buildId: id,
                 dateTime: new Date().toISOString(),
             });
             currentBuildIndex++;
@@ -95,8 +99,12 @@ async function distributeBuilds() {
             })
         ) {
             /** Агент запустился, запускаем event */
-            eventEmmiter.emit(actions.buildStarted, {
+            eventEmmiter.emit(actions.agentStarted, {
                 id,
+                agentUrl: agent.getUrl(),
+            });
+            eventEmmiter.emit(actions.buildStarted, {
+                buildId: id,
                 dateTime: new Date().toISOString(),
             });
             currentBuildIndex++;

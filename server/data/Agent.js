@@ -32,7 +32,7 @@ Agent.prototype.build = async function ({
     buildCommand,
 }) {
     try {
-        const response = await axios.post(this.getUrl(), {
+        const response = await axios.post(`${this.getUrl()}/build`, {
             id,
             repoUrl,
             commitHash,

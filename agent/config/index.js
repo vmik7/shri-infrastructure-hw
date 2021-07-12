@@ -12,8 +12,6 @@ const SERVER_PORT = process.env.SERVER_PORT || config.serverPort;
 /** Constants */
 
 exports.PORT = PORT;
-exports.SERVER_HOST = SERVER_HOST;
-exports.SERVER_PORT = SERVER_PORT;
 exports.tryToConnectInterval = 1000 * 10;
 
 /** Axios configuration */

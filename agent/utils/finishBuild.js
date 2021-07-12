@@ -1,16 +1,19 @@
+const signale = require('signale');
+
 const { sendResult } = require('../api/sendResult');
-const { waitForRegister } = require('./waitForRegister');
+const { tryToRegister } = require('./tryToRegister');
 
 async function finishBuild() {
-    console.log('Sending results...');
-    const result = await sendResult();
+    signale.start('Sending results...');
+    const sended = await sendResult();
 
-    // if (!result) {
-    //     console.log('Results was not saved! Have some errors!');
-    //     await waitForRegister();
-    // }
-
-    console.log('Results was sended!');
+    if (!sended) {
+        signale.error('Results was not saved!');
+        signale.await('Waiting for registration...');
+        tryToRegister();
+    } else {
+        signale.success('Results was sended!');
+    }
 }
 
 module.exports = { finishBuild };

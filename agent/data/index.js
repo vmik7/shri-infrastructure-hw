@@ -1,8 +1,12 @@
-exports.task = {
+const task = {
     id: null,
+    status: null,
+    log: null,
+    duration: null,
+
     repoUrl: null,
     commitHash: null,
     buildCommand: null,
-    status: null,
-    log: null,
 };
+
+module.exports = { task };

@@ -1,3 +1,5 @@
+const signale = require('signale');
+
 const { PORT, axiosInstance } = require('../config');
 
 async function registerMe() {
@@ -6,8 +8,13 @@ async function registerMe() {
             host: 'localhost',
             port: PORT,
         });
-        return response.status === 200;
-    } catch {
+        if (response.status === 200) {
+            return true;
+        }
+        // signale.error('Register fault! Status', response.status);
+        return false;
+    } catch (err) {
+        // signale.error('Register fault!', err);
         return false;
     }
 }

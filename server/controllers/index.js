@@ -1,8 +1,10 @@
+// const signale = require('signale');
+
 const { eventEmmiter, actions } = require('../data');
 
 function notifyAgent(req, res) {
-    console.log('A new agent found!');
-    console.log('data:', req.body);
+    // console.log('A new agent found!');
+    // console.log('data:', req.body);
 
     const { host, port } = req.body;
     eventEmmiter.emit(actions.agentNotified, { host, port });
@@ -11,8 +13,8 @@ function notifyAgent(req, res) {
 }
 
 async function notifyBuildResult(req, res) {
-    console.log('Build results was received!');
-    console.log('data:', req.body);
+    // console.log('Build results was received!');
+    // console.log('data:', req.body);
 
     const { id, status, log, duration } = req.body;
     eventEmmiter.emit(actions.agentFinished, { id, status, log, duration });

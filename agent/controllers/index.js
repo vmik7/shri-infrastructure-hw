@@ -1,24 +1,29 @@
-const { task } = require('../data');
+const signale = require('signale');
+
+const agentData = require('../data');
 const { finishBuild } = require('../utils/finishBuild');
 
 function build(req, res) {
-    console.log('Received a new build!');
-    console.log('params:', req.body);
+    signale.start('Received a new build!');
+    signale.note('params:', req.body);
 
     const { id, repoUrl, commitHash, buildCommand } = req.body;
 
-    task.id = id;
-    task.repoUrl = repoUrl;
-    task.commitHash = commitHash;
-    task.buildCommand = buildCommand;
+    agentData.task.id = id;
+    agentData.task.repoUrl = repoUrl;
+    agentData.task.commitHash = commitHash;
+    agentData.task.buildCommand = buildCommand;
 
     // TODO: Запустить настоящую сборку, а не заглушку
 
     setTimeout(async () => {
-        console.log('Build is finished!');
+        signale.success('Build is finished!');
 
-        task.status = true;
-        task.log = 'Build complited successfully!';
+        agentData.task.status = 0;
+        agentData.task.duration = 123;
+        agentData.task.log = 'Build complited successfully!';
+
+        signale.note(agentData.task);
 
         await finishBuild();
     }, 1000 * 5);
