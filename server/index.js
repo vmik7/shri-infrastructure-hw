@@ -11,7 +11,7 @@ const { lifeCycle } = require('./utils/lifeCycle');
 const { checkSettings } = require('./utils/checkSettings');
 const { getLastCommit } = require('./utils/getLastCommit');
 const { getNewCommits } = require('./utils/getNewCommits');
-// const { findPastBuilds } = require('./utils/findPastBuilds');
+const { findPastBuilds } = require('./utils/findPastBuilds');
 const { Agent } = require('./data/Agent');
 const { requestBuild, startBuild, finishBuild, cancelBuild } = require('./api');
 
@@ -40,12 +40,12 @@ app.use('/', mainRouter);
 app.listen(PORT, async () => {
     signale.start(`Server started! http://localhost:${PORT}`);
 
-    // .on(actions.settingsChanged, (data) => {
-    //     signale.star(actions.settingsChanged, ', data:', data);
-    //     findPastBuilds();
-    // })
-
     eventEmmiter
+        .on(actions.settingsChanged, (data) => {
+            signale.star(actions.settingsChanged, ', data:', data);
+            findPastBuilds();
+        })
+
         .on(actions.buildRequested, (data) => {
             signale.star(actions.buildRequested, ', data:', data);
 
@@ -114,8 +114,8 @@ app.listen(PORT, async () => {
     }
 
     await getLastCommit();
-    // await findPastBuilds();
-    // eventEmmiter.emit(actions.settingsChanged);
+    await findPastBuilds();
+    eventEmmiter.emit(actions.settingsChanged);
 
     getNewCommits();
 

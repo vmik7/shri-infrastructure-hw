@@ -33,7 +33,7 @@ const eventEmmiter = new EventEmitter();
 
 // Список actions для eventEmmiter
 const actions = {
-    // settingsChanged: 'SETTINGS_CHANGED',
+    settingsChanged: 'SETTINGS_CHANGED',
 
     buildRequested: 'BUILD_REQUESTED',
     buildStarted: 'BUILD_STARTED',
