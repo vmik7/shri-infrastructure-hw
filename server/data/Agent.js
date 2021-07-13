@@ -20,7 +20,7 @@ Agent.prototype.isAlive = async function () {
         const response = await axios.get(this.getUrl());
         return response.status === 200;
     } catch (err) {
-        console.error('Can not connect with agent', this.getUrl(), '!', err);
+        // console.error('Can not connect with agent', this.getUrl(), '!', err);
         return false;
     }
 };
@@ -45,7 +45,7 @@ Agent.prototype.build = async function ({
         }
         return false;
     } catch (err) {
-        console.error('Can not connect with agent', this.getUrl(), '!', err);
+        // console.error('Can not connect with agent', this.getUrl(), '!', err);
         return false;
     }
 };

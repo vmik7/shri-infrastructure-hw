@@ -56,13 +56,13 @@ app.listen(PORT, async () => {
             signale.star(actions.buildStarted, ', data:', data);
 
             const { buildId, dateTime } = data;
-            startBuild({ buildId, dateTime });
+            // startBuild({ buildId, dateTime });
         })
         .on(actions.buildFinished, (data) => {
             signale.star(actions.buildFinished, ', data:', data);
 
             const { buildId, duration, success, buildLog } = data;
-            finishBuild({ buildId, duration, success, buildLog });
+            // finishBuild({ buildId, duration, success, buildLog });
         })
         .on(actions.buildCanceled, (data) => {
             signale.star(actions.buildCanceled, ', data:', data);
@@ -99,7 +99,7 @@ app.listen(PORT, async () => {
             });
 
             const agentUrl = agentByBuildId.get(id);
-            // agentByBuildId.delete(id);
+            agentByBuildId.delete(id);
 
             const agent = agents.get(agentUrl);
             agent.buildId = null;

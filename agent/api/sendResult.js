@@ -1,11 +1,8 @@
 const signale = require('signale');
 
 const { axiosInstance } = require('../config');
-const { task } = require('../data');
 
-async function sendResult() {
-    const { id, status, log, duration } = task;
-
+async function sendResult({ id, status, log, duration }) {
     try {
         const response = await axiosInstance.post('/notify-build-result ', {
             id,
