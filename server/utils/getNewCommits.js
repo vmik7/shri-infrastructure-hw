@@ -3,25 +3,30 @@ const add = require('date-fns/add');
 
 const { myOctokit } = require('../config');
 const serverData = require('../data');
+const { getLastCommit } = require('./getLastCommit');
 
 const perPage = 100;
 
+/**
+ * Ищет новые коммиты в репозитории
+ * @returns {undefined}
+ */
 async function getNewCommits() {
     // signale.start('getNewCommits');
 
     const {
-        settings: { repoOwner, repoName, period },
+        settings: { repoOwner, repoName },
         lastCommitDate,
         eventEmmiter,
         actions,
     } = serverData;
 
-    /** Дата последнего коммита + 1 секунда */
+    /* Дата последнего коммита + 1 секунда */
     const nextDate = add(new Date(lastCommitDate), {
         seconds: 1,
     }).toISOString();
 
-    /** Получаем главную ветку */
+    /* Получаем главную ветку */
 
     const {
         data: { default_branch: defaultBranch },
@@ -35,7 +40,7 @@ async function getNewCommits() {
         return;
     }
 
-    /** Получаем новые коммиты */
+    /* Получаем новые коммиты */
 
     const newCommits = [];
     let currentPage = 1;
@@ -76,8 +81,7 @@ async function getNewCommits() {
         }
     }
 
-    /** Добавляем новые коммиты в очередь */
-
+    /* Добавляем новые коммиты в очередь */
     newCommits.forEach(
         ({ commitMessage, commitHash, branchName, authorName }) => {
             eventEmmiter.emit(actions.buildRequested, {
@@ -89,15 +93,13 @@ async function getNewCommits() {
         },
     );
 
-    /** Отчёт */
-
+    /* Отчёт */
     if (newCommits.length) {
         signale.note('Found', newCommits.length, 'new commits.');
     }
 
-    /** Планируем следующий запуск */
-
-    setTimeout(getNewCommits, period * 1000 * 60);
+    /* Обновляем последний коммит */
+    getLastCommit();
 }
 
 module.exports = { getNewCommits };

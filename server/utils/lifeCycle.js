@@ -8,6 +8,10 @@ const { getLastCommit } = require('./getLastCommit');
 const { checkAgents } = require('./checkAgents');
 const { distributeBuilds } = require('./distributeBuilds');
 
+/**
+ * Основной жизненный цикл сервера
+ * @returns {undefined}
+ */
 async function lifeCycle() {
     // signale.start('lifeCycle');
 

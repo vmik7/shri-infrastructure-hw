@@ -1,37 +1,68 @@
 const EventEmitter = require('events');
 
-// текущие настройки CI сервера
-const settings = {
-    id: null,
-    repoOwner: null,
-    repoName: null,
-    repoUrl: null,
-    period: 1,
-    buildCommand: null,
-    mainBranch: null,
-};
+/**
+ * @typedef Settings
+ * @property {string} id            Configuration ID
+ * @property {string} repoOwner     Repository owner
+ * @property {string} repoName      Repository name
+ * @property {string} repoUrl       Repository url = https://github.com/{repoOwner}/{repoName}.git
+ * @property {number} period        Sync interval for new commits (minutes)
+ * @property {string} buildCommand  Bash command for build project
+ * @property {string} mainBranch    Main branch
+ */
 
-// Map с агентами
+/**
+ * Текущие настройки CI сервера
+ * @type {Settings}
+ */
+const settings = {};
+
+/**
+ * Map с агентами
+ * @type {Map<string:object>} Key - agent URL, value - Agent object
+ * */
 const agents = new Map();
 
-// Ключ - BuildId, значение - url агнета
+/**
+ * Распределение сборок
+ * @type {Map<string:string>} Key - build ID, value - agent URL
+ * */
 const agentByBuildId = new Map();
 
-// Главная очередь билдов
-// элементы массива: { id, commitHash }
+/**
+ * @typedef Build
+ * @property {string} id            Build ID
+ * @property {string} commitHash    Hash of the commit
+ */
+
+/**
+ * Главная очередь билдов
+ * @type {Build[]}
+ */
 const mainQueue = [];
 
-// Очередь билдов на пересборку, их агенты перестали отвечать
-// элементы массива: { id, commitHash }
+/**
+ * Очередь билдов на пересборку, их агенты перестали отвечать
+ * @type {Build[]}
+ */
 const rebuildQueue = [];
 
-// Date последнего коммита в формате ISO: YYYY-MM-DDTHH:MM:SSZ
+/**
+ * Date последнего коммита
+ * @type {string} формате ISO: YYYY-MM-DDTHH:MM:SSZ
+ */
 const lastCommitDate = null;
 
-// EventEmmiter для ассинзронной обработки событий
+/**
+ * EventEmmiter для ассинхронной обработки событий
+ * @type {EventEmmiter}
+ */
 const eventEmmiter = new EventEmitter();
 
-// Список actions для eventEmmiter
+/**
+ * Константы событий для EventEmmiter
+ * @type {Object}
+ */
 const actions = {
     settingsChanged: 'SETTINGS_CHANGED',
 

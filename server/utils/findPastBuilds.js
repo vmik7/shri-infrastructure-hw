@@ -3,6 +3,10 @@ const signale = require('signale');
 const serverData = require('../data');
 const { fetchBuilds } = require('../api/fetchBuilds');
 
+/**
+ * Ищет билды в БД, которые не совпадают с текущей кофигурацией
+ * @returns {undefined}
+ */
 async function findPastBuilds() {
     // signale.start('findPastBuilds');
 
@@ -15,7 +19,7 @@ async function findPastBuilds() {
     let allLoaded = false;
 
     while (!allLoaded) {
-        /** Достаём сборки из базы данных */
+        /* Достаём сборки из базы данных */
         const { data: allBuilds } = await fetchBuilds({ limit, offset });
 
         if (!allBuilds) {
@@ -23,9 +27,8 @@ async function findPastBuilds() {
             return;
         }
 
-        /** Выбирам сборки, которые в статусе InProgress или Waiting
-         * и которые не совпадают с текущими настройками
-         * */
+        /* Выбирам сборки, которые в статусе InProgress или Waiting
+        и не совпадают с текущими настройками */
         const buildsToCancel = allBuilds.filter((build) => {
             return (
                 (build.status === 'InProgress' || build.status === 'Waiting') &&
@@ -33,7 +36,7 @@ async function findPastBuilds() {
             );
         });
 
-        /** Если массив пустой, значи уже всё загружено */
+        /* Если массив пустой, значи уже всё загружено */
         if (buildsToCancel.length === 0) {
             allLoaded = true;
         }
@@ -49,8 +52,7 @@ async function findPastBuilds() {
         eventEmmiter.emit(actions.buildCanceled({ buildId: build.id }));
     }
 
-    /** Отчёт */
-
+    /* Отчёт */
     if (pastBuilds.length) {
         signale.note('Found', pastBuilds.length, 'past builds');
     }

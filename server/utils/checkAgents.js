@@ -2,6 +2,10 @@ const signale = require('signale');
 
 const serverData = require('../data');
 
+/**
+ * Проверяет всех зарегистрированных агентов, живы ли они
+ * @returns {undefined}
+ */
 async function checkAgents() {
     // signale.start('checkAgents');
 
@@ -9,6 +13,7 @@ async function checkAgents() {
 
     for (const agentUrl of agents.keys()) {
         const agent = agents.get(agentUrl);
+
         if (agent.buildId && (await !agent.isAlive())) {
             const { buildId, commitHash } = agent;
             serverData.rebuildQueue.push({ buildId, commitHash });

@@ -1,10 +1,11 @@
 // const signale = require('signale');
+const serverData = require('../data');
 
-const { eventEmmiter, actions } = require('../data');
+const { eventEmmiter, actions } = serverData;
 
 function notifyAgent(req, res) {
-    // console.log('A new agent found!');
-    // console.log('data:', req.body);
+    // signale.log('A new agent found!');
+    // signale.log('data:', req.body);
 
     const { host, port } = req.body;
     eventEmmiter.emit(actions.agentNotified, { host, port });
@@ -13,10 +14,18 @@ function notifyAgent(req, res) {
 }
 
 async function notifyBuildResult(req, res) {
-    // console.log('Build results was received!');
-    // console.log('data:', req.body);
+    // signale.log('Build results was received!');
+    // signale.log('data:', req.body);
 
     const { id, status, log, duration } = req.body;
+
+    /* Если агент не зарегистрирован - игнорируем запрос */
+    const agentUrl = serverData.agentByBuildId.get(id);
+    if (!agentUrl) {
+        res.status(404).end();
+        return;
+    }
+
     eventEmmiter.emit(actions.agentFinished, { id, status, log, duration });
 
     res.status(200).end();

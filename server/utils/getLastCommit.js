@@ -3,6 +3,10 @@ const signale = require('signale');
 const { myOctokit } = require('../config');
 const serverData = require('../data');
 
+/**
+ * Находит последний коммит в репозитории и запоминает его дату
+ * @returns {undefined}
+ */
 async function getLastCommit() {
     // signale.start('getLastCommit');
 
@@ -10,7 +14,7 @@ async function getLastCommit() {
         settings: { repoOwner, repoName },
     } = serverData;
 
-    /** Получаем последний коммит в главной ветке */
+    /* Получаем последний коммит в главной ветке */
 
     const {
         data: [lastCommit],
@@ -27,8 +31,7 @@ async function getLastCommit() {
 
     serverData.lastCommitDate = lastCommit.commit.author.date;
 
-    /** Отчёт */
-
+    /* Отчёт */
     signale.note('last commit date is', serverData.lastCommitDate);
 }
 

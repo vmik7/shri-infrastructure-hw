@@ -2,13 +2,14 @@ const { spawn } = require('child_process');
 
 /**
  * @typedef Result
- * @property {string} out Output (stdout, stderr).
- * @property {number} code Exit code.
+ * @property {string} out   Output (stdout, stderr).
+ * @property {number} code  Exit code.
  */
 
-/** Выполнение bash комманды
- * @param {string} command Command to run on bash shell.
- * @returns {Promise<Result>} Promise that will be resolved when command finished.
+/**
+ * Выполнение bash комманды
+ * @param {string} command      Command to run on bash shell.
+ * @returns {Promise<Result>}   Promise that will be resolved when command finished.
  */
 function bash(command) {
     return new Promise((resolve) => {

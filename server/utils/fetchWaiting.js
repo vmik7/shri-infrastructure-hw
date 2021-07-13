@@ -3,10 +3,14 @@ const signale = require('signale');
 const { mainQueue } = require('../data');
 const { fetchBuilds } = require('../api/fetchBuilds');
 
+/**
+ * Получает из БД билды, ожидающие запуска
+ * @returns {undefined}
+ */
 async function fetchWaiting() {
     // signale.start('fetchWaiting');
 
-    /** Последняя сборка, добавленная в очередь */
+    /* Последняя сборка, добавленная в очередь */
     const lastQueuedId = mainQueue.length
         ? mainQueue[mainQueue.length - 1].id
         : null;
@@ -18,7 +22,7 @@ async function fetchWaiting() {
     let allLoaded = false;
 
     while (!allLoaded) {
-        /** Достаём сборки из базы данных */
+        /* Достаём сборки из базы данных */
         const { data: allBuilds } = await fetchBuilds({ limit, offset });
 
         if (!allBuilds) {
@@ -26,7 +30,7 @@ async function fetchWaiting() {
             return;
         }
 
-        /** Выбирам сборки, которые в статусе Waiting */
+        /* Выбирам сборки, которые в статусе Waiting */
         const waitingBuilds = allBuilds
             .filter((build) => build.status === 'Waiting')
             .map((build) => {
@@ -36,12 +40,12 @@ async function fetchWaiting() {
                 };
             });
 
-        /** Если массив пустой, значи уже всё загружено */
+        /* Если массив пустой, значи уже всё загружено */
         if (waitingBuilds.length === 0) {
             allLoaded = true;
         }
 
-        /** Выбираем все сборки, которые ещё не в очереди */
+        /* Выбираем все сборки, которые ещё не в очереди */
         for (const build of waitingBuilds) {
             if (build.id === lastQueuedId) {
                 allLoaded = true;
@@ -56,10 +60,10 @@ async function fetchWaiting() {
         }
     }
 
-    /** Вставляем новые сборки в очередь в обратном порядке */
+    /* Вставляем новые сборки в очередь в обратном порядке */
     mainQueue.push(...newBuilds.reverse());
 
-    /** Отчёт */
+    /* Отчёт */
     if (newBuilds.length) {
         signale.note('Found', newBuilds.length, 'waiting builds.');
     }

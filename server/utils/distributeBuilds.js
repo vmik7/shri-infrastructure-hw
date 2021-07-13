@@ -2,6 +2,10 @@ const signale = require('signale');
 
 const serverData = require('../data');
 
+/**
+ * Распределяет задачи из очередей по свободным агентам
+ * @returns {undefined}
+ */
 async function distributeBuilds() {
     // signale.start('distributeBuilds');
 
@@ -14,7 +18,7 @@ async function distributeBuilds() {
         actions,
     } = serverData;
 
-    /** Ищем свободных агентов */
+    /* Ищем свободных агентов */
 
     const freeAgents = [];
 
@@ -24,11 +28,7 @@ async function distributeBuilds() {
         }
     });
 
-    /** Отчёт */
-
-    // signale.note(`Найдено ${freeAgents.length} свободных агентов`);
-
-    /** Распределяем задачи с очереди перезапуска */
+    /* Распределяем задачи с очереди перезапуска */
 
     let agentIndex = 0;
     let currentBuildIndex = 0;
@@ -50,7 +50,7 @@ async function distributeBuilds() {
                 buildCommand,
             })
         ) {
-            /** Агент запустился, запускаем events */
+            /* Агент запустился, запускаем events */
             eventEmmiter.emit(actions.agentStarted, {
                 id,
                 agentUrl: agent.getUrl(),
@@ -61,23 +61,21 @@ async function distributeBuilds() {
             });
             currentBuildIndex++;
         } else {
-            /** Агент не смог запустить сборку, забываем о нём навсегда */
+            /* Агент не смог запустить сборку, забываем о нём навсегда */
             agents.delete(freeAgents[agentIndex]);
         }
         agentIndex++;
     }
 
-    /** Удаляем перезапущенные задачи из очереди */
-
+    /* Удаляем перезапущенные задачи из очереди */
     rebuildQueue.splice(0, currentBuildIndex);
 
-    /** Отчёт */
-
+    /* Отчёт */
     if (currentBuildIndex) {
         signale.note(`Перезапущено ${currentBuildIndex} сборок`);
     }
 
-    /** Распределяем задачи с очереди перезапуска */
+    /* Распределяем задачи с очереди перезапуска */
 
     currentBuildIndex = 0;
 
@@ -98,7 +96,7 @@ async function distributeBuilds() {
                 buildCommand,
             })
         ) {
-            /** Агент запустился, запускаем event */
+            /* Агент запустился, запускаем event */
             eventEmmiter.emit(actions.agentStarted, {
                 id,
                 agentUrl: agent.getUrl(),
@@ -109,17 +107,16 @@ async function distributeBuilds() {
             });
             currentBuildIndex++;
         } else {
-            /** Агент не смог запустить сборку, забываем о нём навсегда */
+            /* Агент не смог запустить сборку, забываем о нём навсегда */
             agents.delete(freeAgents[agentIndex]);
         }
         agentIndex++;
     }
 
-    /** Удаляем запущенные задачи из очереди */
+    /* Удаляем запущенные задачи из очереди */
     mainQueue.splice(0, currentBuildIndex);
 
-    /** Отчёт */
-
+    /* Отчёт */
     if (currentBuildIndex) {
         signale.note(`Запущено ${currentBuildIndex} сборок`);
     }

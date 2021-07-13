@@ -3,10 +3,12 @@ const signale = require('signale');
 const { fetchSettings } = require('../api');
 const serverData = require('../data');
 
+/**
+ * Проверяет, не изменились ли настройки
+ * @returns {boolean} true -> Settings were changed
+ */
 async function checkSettings() {
     // signale.start('checkSettings');
-
-    /** Получаем настройки */
 
     const { data: settings } = await fetchSettings();
 
@@ -15,11 +17,7 @@ async function checkSettings() {
         return false;
     }
 
-    /** Сравниваем с текущими */
-
     if (serverData.settings.id !== settings.id) {
-        /** Сохраняем */
-
         serverData.settings.id = settings.id;
         serverData.settings.repoOwner = settings.repoName.split('/')[0];
         serverData.settings.repoName = settings.repoName.split('/')[1];
@@ -27,8 +25,6 @@ async function checkSettings() {
         serverData.settings.period = settings.period;
         serverData.settings.buildCommand = settings.buildCommand;
         serverData.settings.mainBranch = settings.mainBranch;
-
-        /** Отчёт */
 
         signale.note('settings changed!');
         console.log(serverData.settings);
