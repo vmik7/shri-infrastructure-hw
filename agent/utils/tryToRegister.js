@@ -7,10 +7,9 @@ async function tryToRegister() {
     // signale.await('Try to register...');
 
     /** Попытка регистрации */
-    const connected = await registerMe();
+    const isConnected = await registerMe();
 
-    if (!connected) {
-        /** Следующая попытка */
+    if (!isConnected) {
         setTimeout(tryToRegister, tryToConnectInterval);
     } else {
         /** Успешная регистрация */

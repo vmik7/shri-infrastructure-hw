@@ -1,11 +1,11 @@
-const signale = require('signale');
+// const signale = require('signale');
 
-const { PORT, axiosInstance } = require('../config');
+const { PORT, currentHost, axiosInstance } = require('../config');
 
 async function registerMe() {
     try {
         const response = await axiosInstance.post('/notify-agent', {
-            host: 'localhost',
+            host: currentHost,
             port: PORT,
         });
         if (response.status === 200) {

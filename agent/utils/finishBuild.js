@@ -10,7 +10,7 @@ async function finishBuild({ id, status, log, duration }) {
     const sended = await sendResult({ id, status, log, duration });
 
     if (!sended) {
-        signale.error('Results was not saved!');
+        signale.error('Results was not sended!');
 
         /** Результаты не отправлениы, регистрируемся заново */
         signale.await('Waiting for registration...');

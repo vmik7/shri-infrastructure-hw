@@ -11,9 +11,7 @@
   },
   "scripts": {
     "start": "node index",
-    "watch": "nodemon index",
-    "build-docker-image": "docker build -t vmik7/server .",
-    "docker": "docker run -p 5051:5051 --name server vmik7/server"
+    "watch": "nodemon index"
   },
   "dependencies": {
     "@octokit/core": "^3.5.1",

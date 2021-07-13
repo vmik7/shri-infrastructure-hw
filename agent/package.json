@@ -13,13 +13,12 @@
     "start": "node index",
     "watch": "nodemon index",
     "build-docker-image": "docker build -t vmik7/agent .",
-    "docker": "docker run -p 5052:5052 --link server --name agent-1 vmik7/agent"
+    "docker": "scripts/docker.sh -i"
   },
   "dependencies": {
     "axios": "^0.21.1",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
-    "morgan": "^1.10.0",
     "signale": "^1.4.0"
   },
   "devDependencies": {

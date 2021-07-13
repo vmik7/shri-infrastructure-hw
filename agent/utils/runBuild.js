@@ -39,6 +39,12 @@ async function runBuild({ id, repoUrl, commitHash, buildCommand }) {
         });
         signale.success('Now on', commitHash, 'commit');
 
+        /** Переключаемся на нужный коммит */
+        await execFile('npm', ['ci'], {
+            cwd: buildDirectory,
+        });
+        signale.success('Dependences was installed');
+
         /** Выполняем bash комманду */
         const { out, code } = await bash(
             `cd ${buildDirectory} && ${buildCommand}`,

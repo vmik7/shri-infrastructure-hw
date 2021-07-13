@@ -1,5 +1,5 @@
 {
-  "port": 5052,
-  "serverHost": "localhost",
-  "serverPort": 5051
+  "port": 5051,
+  "serverHost": "host.docker.internal",
+  "serverPort": 5050
 }
